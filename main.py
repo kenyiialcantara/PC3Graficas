@@ -12,16 +12,14 @@ width = 800
 height = 600
 size = (width, height)
 
-#ventana con OpenGL
+
 screen = pygame.display.set_mode(size, DOUBLEBUF | OPENGL)
 
-# Perspectiva OpenGL
 gluPerspective(45, (width / height), 0.1 , 50.0)
 
 # Mover la cámara hacia atrás
 glTranslatef(0.0, 0.0, -5)
 
-# fondo
 background_texture = pygame.image.load('background.jpg')
 
 def draw_background():
@@ -34,7 +32,7 @@ def draw_background():
     image_data = pygame.image.tostring(background_texture, 'RGBA', 1)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, background_texture.get_width(), background_texture.get_height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data)
 
-    # Dibujar un plano con la textura de fondo
+    # Dibujando un plano con la textura de fondo
     glBegin(GL_QUADS)
     glTexCoord2f(0.0, 0.0)
     glVertex3f(-2.5, -2.5, -1.0)
@@ -48,7 +46,7 @@ def draw_background():
 
     glDisable(GL_TEXTURE_2D)
 
-# Lista para almacenar los cuadrados
+
 squares = []
 
 # Círculo (visor)
@@ -60,7 +58,7 @@ shoot_sound = pygame.mixer.Sound('disparo.wav')
 def play_shoot_sound():
     shoot_sound.play()
 
-# generar un cuadrado aleatorio
+# Fun para generar cuadrados aleatorio
 def generate_square():
     x = random.uniform(-1.5, 1.5)
     y = random.uniform(-1.5, 1.5)
