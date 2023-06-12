@@ -60,14 +60,14 @@ while True:
         if event.type == pygame.MOUSEMOTION:
             # Obtener la posición del ratón y convertirla a coordenadas OpenGL
             mouse_x, mouse_y = event.pos
-            norm_x = (mouse_x / width) * 2 - 1
-            norm_y = -(mouse_y / height) * 2 + 1
+            norm_x = (mouse_x / width) * 4 - 1
+            norm_y = -(mouse_y / height) * 4 + 1
             circle_pos = (norm_x, norm_y)
         if event.type == pygame.MOUSEBUTTONDOWN:
             # Obtener la posición del clic del ratón y convertirla a coordenadas OpenGL
             mouse_x, mouse_y = event.pos
-            norm_x = (mouse_x / width) * 2 - 1
-            norm_y = -(mouse_y / height) * 2 + 1
+            norm_x = (mouse_x / width) * 4 - 1
+            norm_y = -(mouse_y / height) * 4 + 1
 
             # Buscar si se hizo clic sobre algún cuadrado y eliminarlo
             for square in squares:
