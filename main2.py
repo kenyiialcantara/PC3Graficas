@@ -76,16 +76,17 @@ def generate_square():
     x = random.uniform(-1.5, 1.5)
     y = random.uniform(-1.5, 1.5)
     size = random.uniform(0.1, 0.3)
-    speed_x = random.uniform(-0.01,0.01)
-    speed_y = random.uniform(-0.01, 0.01)
+    # speed_x = random.uniform(-0.01,0.01)
+    # speed_y = random.uniform(-0.01, 0.01)
+    speed_x = 0.01
+    speed_y = 0.01
     return (x, y, size, speed_x, speed_y)
 
 # Generar cuadrados iniciales
 for _ in range(10):
     squares.append(generate_square())
 
-spx = 1
-spy = 1
+
 
 # Bucle principal del programa
 while True:
@@ -119,8 +120,8 @@ while True:
     draw_background()
 
     # Actualizar la posición de los cuadrados
-    for square in squares:
-        x, y, size, speed_x, speed_y = square
+    for i in range(len(squares)):
+        x, y, size, speed_x, speed_y = squares[i]
         x += speed_x
         y += speed_y
         # Verificar los límites de la pantalla
@@ -128,7 +129,7 @@ while True:
             speed_x *= -1
         if y + size > 2.5 or y - size < -2.5:
             speed_y *= -1
-        square = (x, y, size, speed_x, speed_y)
+        squares[i] = (x, y, size, speed_x, speed_y)
 
     # Renderizar los cuadrados en OpenGL
     glBegin(GL_QUADS)
