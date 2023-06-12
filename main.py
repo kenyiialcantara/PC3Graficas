@@ -117,7 +117,7 @@ while True:
     glBegin(GL_QUADS)
     for square in squares:
         x, y, size = square
-        glColor3f(1.0, 0.0, 0.0)  # Color rojo
+        glColor3f(1.0, 0.5, 0.0)  # Color rojo
         glVertex3f(x - size, y - size, 0.0)
         glVertex3f(x + size, y - size, 0.0)
         glVertex3f(x + size, y + size, 0.0)
@@ -125,7 +125,7 @@ while True:
     glEnd()
 
     # Dibujar el círculo que sigue la posición del ratón
-    glColor3f(0.0, 0.0, 1.0)  # Color azul
+    glColor3f(1.0, 1.0, 1.0)  # Color azul
     glPushMatrix()
     glTranslatef(circle_pos[0], circle_pos[1], 0.0)
     glBegin(GL_TRIANGLE_FAN)
