@@ -9,7 +9,7 @@ import random
 pygame.init()
 
 width = 800
-height = 600
+height = 800
 size = (width, height)
 
 
@@ -85,14 +85,14 @@ while True:
         if event.type == pygame.MOUSEMOTION:
 
             mouse_x, mouse_y = event.pos
-            norm_x = (mouse_x / width) * 4 - 1
-            norm_y = -(mouse_y / height) * 4 + 1
+            norm_x = (mouse_x / width) * 4 - 2
+            norm_y = -(mouse_y / height) * 4 + 2
             circle_pos = (norm_x, norm_y)
         if event.type == pygame.MOUSEBUTTONDOWN:
 
             mouse_x, mouse_y = event.pos
-            norm_x = (mouse_x / width) * 4 - 1
-            norm_y = -(mouse_y / height) * 4 + 1
+            norm_x = (mouse_x / width) * 4 - 2
+            norm_y = -(mouse_y / height) * 4 + 2
 
             # Si se hizo clic sobre algún cuadrado y eliminarlo
             for square in squares:
