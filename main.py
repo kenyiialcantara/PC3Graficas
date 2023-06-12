@@ -21,16 +21,17 @@ gluPerspective(45, (width / height), 0.1 , 50.0)
 glTranslatef(0.0, 0.0, -5)
 
 background_texture = pygame.image.load('background.jpg')
+ganaste_texture = pygame.image.load('Ganaste.png')
 
-def draw_background():
+def draw_background(image):
 
     glEnable(GL_TEXTURE_2D)
     textures = glGenTextures(1)
     glBindTexture(GL_TEXTURE_2D, textures)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-    image_data = pygame.image.tostring(background_texture, 'RGBA', 1)
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, background_texture.get_width(), background_texture.get_height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data)
+    image_data = pygame.image.tostring(image, 'RGBA', 1)
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.get_width(), image.get_height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data)
 
     # Dibujando un plano con la textura de fondo
     glBegin(GL_QUADS)
@@ -107,6 +108,7 @@ while True:
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     if remaining_squares == 0:
+        draw_background(ganaste_texture)
         # El aviso de "Game Over"
         print('Gameover')
         font = pygame.font.SysFont('serif', 40)
@@ -116,7 +118,7 @@ while True:
         screen.blit(text, [center_x,center_y])
     else:
 
-        draw_background()
+        draw_background(background_texture)
 
         # Actualizar la posición de los cuadrados
         for i in range(len(squares)):
@@ -134,7 +136,10 @@ while True:
         glBegin(GL_QUADS)
         for square in squares:
             x, y, size, _, _ = square
-            glColor3f(1.0, 0.0, 0.0)  # Color rojo
+            r = random.uniform(0, 1)
+            g = random.uniform(0, 1)
+            b = random.uniform(0, 1)
+            glColor3f(r, g, b)  # Color rojo
             glVertex3f(x - size, y - size, 0.0)
             glVertex3f(x + size, y - size, 0.0)
             glVertex3f(x + size, y + size, 0.0)
