@@ -84,6 +84,9 @@ def generate_square():
 for _ in range(10):
     squares.append(generate_square())
 
+spx = 1
+spy = 1
+
 # Bucle principal del programa
 while True:
     for event in pygame.event.get():
@@ -138,7 +141,6 @@ while True:
         glVertex3f(x - size, y + size, 0.0)
     glEnd()
 
-    # Dibujar el círculo que sigue la posición del ratón
     # Dibujar el círculo que sigue la posición del ratón
     glColor3f(1.0, 1.0, 1.0)  # Color azul
     glPushMatrix()
