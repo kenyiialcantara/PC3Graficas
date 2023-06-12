@@ -6,40 +6,32 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 import random
 
-# Inicializar Pygame
 pygame.init()
 
-# Definir el tamaño de la ventana
 width = 800
 height = 600
 size = (width, height)
 
-# Crear la ventana con OpenGL
+#ventana con OpenGL
 screen = pygame.display.set_mode(size, DOUBLEBUF | OPENGL)
 
-# Establecer la perspectiva OpenGL
+# Perspectiva OpenGL
 gluPerspective(45, (width / height), 0.1 , 50.0)
 
 # Mover la cámara hacia atrás
 glTranslatef(0.0, 0.0, -5)
 
-# Cargar la textura de fondo
+# fondo
 background_texture = pygame.image.load('background.jpg')
 
-# Función para dibujar el fondo
 def draw_background():
-    # Habilitar el uso de texturas
+
     glEnable(GL_TEXTURE_2D)
-    # Crear una lista de texturas
     textures = glGenTextures(1)
-    # Asignar la textura cargada al primer elemento de la lista
     glBindTexture(GL_TEXTURE_2D, textures)
-    # Configurar los parámetros de la textura
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-    # Convertir la imagen de Pygame a una cadena de píxeles utilizables por OpenGL
     image_data = pygame.image.tostring(background_texture, 'RGBA', 1)
-    # Definir la textura con la imagen convertida
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, background_texture.get_width(), background_texture.get_height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data)
 
     # Dibujar un plano con la textura de fondo
@@ -54,24 +46,21 @@ def draw_background():
     glVertex3f(-2.5, 2.5, -1.0)
     glEnd()
 
-    # Deshabilitar el uso de texturas
     glDisable(GL_TEXTURE_2D)
 
 # Lista para almacenar los cuadrados
 squares = []
 
-# Círculo que sigue la posición del ratón
+# Círculo (visor)
 circle_pos = (0, 0)
 
-# Cargar el sonido de disparo
 pygame.mixer.init()
 shoot_sound = pygame.mixer.Sound('disparo.wav')
 
-# Función para reproducir el sonido de disparo
 def play_shoot_sound():
     shoot_sound.play()
 
-# Función para generar un cuadrado aleatorio
+# generar un cuadrado aleatorio
 def generate_square():
     x = random.uniform(-1.5, 1.5)
     y = random.uniform(-1.5, 1.5)
@@ -82,32 +71,32 @@ def generate_square():
     speed_y = 0.01
     return (x, y, size, speed_x, speed_y)
 
-# Generar cuadrados iniciales
+# cuadrados iniciales
 for _ in range(5):
     squares.append(generate_square())
 
 
 remaining_squares = len(squares) #Para contar los cuadrados (Sirve para el gameover )
 
-# Bucle principal del programa
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             quit()
+        # Obtener la posición del ratón y click, y convertirla a coordenadas OpenGL
         if event.type == pygame.MOUSEMOTION:
-            # Obtener la posición del ratón y convertirla a coordenadas OpenGL
+
             mouse_x, mouse_y = event.pos
             norm_x = (mouse_x / width) * 4 - 1
             norm_y = -(mouse_y / height) * 4 + 1
             circle_pos = (norm_x, norm_y)
         if event.type == pygame.MOUSEBUTTONDOWN:
-            # Obtener la posición del clic del ratón y convertirla a coordenadas OpenGL
+
             mouse_x, mouse_y = event.pos
             norm_x = (mouse_x / width) * 4 - 1
             norm_y = -(mouse_y / height) * 4 + 1
 
-            # Buscar si se hizo clic sobre algún cuadrado y eliminarlo
+            # Si se hizo clic sobre algún cuadrado y eliminarlo
             for square in squares:
                 if norm_x >= square[0] - square[2] and norm_x <= square[0] + square[2] and \
                    norm_y >= square[1] - square[2] and norm_y <= square[1] + square[2]:
@@ -116,11 +105,11 @@ while True:
                     print(remaining_squares)
                     play_shoot_sound()
 
-    # Limpiar la pantalla
+    # Clean la pantalla
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     if remaining_squares == 0:
-        # Renderizar el aviso de "Game Over"
+        # El aviso de "Game Over"
         print('Gameover')
         font = pygame.font.SysFont('serif', 40)
         text = font.render('Game over',False,(1,1,1))
@@ -128,14 +117,15 @@ while True:
         center_y = (height//2) - (text.get_height()//2)
         screen.blit(text, [center_x,center_y])
     else:
-        # Actualizar la posición de los cuadrados
-        # Dibujar el fondo
+
         draw_background()
+
+        # Actualizar la posición de los cuadrados
         for i in range(len(squares)):
             x, y, size, speed_x, speed_y = squares[i]
             x += speed_x
             y += speed_y
-            # Verificar los límites de la pantalla
+            # Límites de la pantalla
             if x + size > 2.5 or x - size < -2.5:
                 speed_x *= -1
             if y + size > 2.5 or y - size < -2.5:
@@ -154,13 +144,13 @@ while True:
         glEnd()
 
 
-        # Dibujar el círculo que sigue la posición del ratón
-        glColor3f(1.0, 1.0, 1.0)  # Color azul
+        # Draw círculo que sigue la posición del ratón
+        glColor3f(1.0, 1.0, 1.0)
         glPushMatrix()
         glTranslatef(circle_pos[0], circle_pos[1], 0.0)
         glBegin(GL_TRIANGLE_FAN)
         glVertex3f(0.0, 0.0, 0.0)
-        num_segments = 100  # Número de segmentos para el círculo
+        num_segments = 100
         for i in range(num_segments + 1):
             theta = (2.0 * 3.1415926) * (float(i) / num_segments)
             x = 0.1 * float(math.cos(theta))
