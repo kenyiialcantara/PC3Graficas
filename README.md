@@ -1,4 +1,4 @@
-# PC3Graficas
+# PC3Graficas (Juego de disparos)
 
 |Integrantes|
 |----|
