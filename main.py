@@ -5,6 +5,8 @@ from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 import random
+import cv2
+import mediapipe as mp
 
 pygame.init()
 
@@ -70,6 +72,39 @@ def generate_square():
     speed_y = 0.01
     return (x, y, size, speed_x, speed_y)
 
+# Función para procesar el fotograma de la cámara
+def process_hand_frame(frame):
+    # Convertir el fotograma a escala de grises
+    imgRGB = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+    # Crear un objeto de detección de manos de Mediapipe
+    mp_hands = mp.solutions.hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.5)
+
+    # Detección de manos en el fotograma
+    results = mp_hands.process(imgRGB)
+
+    print("results.multi_hand_landmarks", results.multi_hand_landmarks)
+
+    # Imprime la posición de la mano
+    if results.multi_hand_landmarks is not None:
+        for hand_landmarks in results.multi_hand_landmarks:
+            print('hand_landmarks:', hand_landmarks)
+            for point in hand_landmarks.landmark:
+                print(point)
+            print('')
+            # Obtener la posición de la mano
+            x = hand_landmarks.landmark[mp.solutions.hands.HandLandmark.INDEX_FINGER_TIP].x
+            y = hand_landmarks.landmark[mp.solutions.hands.HandLandmark.INDEX_FINGER_TIP].y
+            # Convertir la posición de la mano a coordenadas OpenGL
+            norm_x = (x * width / 2) + width / 2
+            norm_y = (y * height / 2) + height / 2
+            norm_x = (norm_x / width) * 4 - 2
+            norm_y = -(norm_y / height) * 4 + 2
+            return (norm_x, norm_y)
+    return None
+
+
+
 # cuadrados iniciales
 for _ in range(5):
     squares.append(generate_square())
@@ -77,7 +112,25 @@ for _ in range(5):
 
 remaining_squares = len(squares) #Para contar los cuadrados (Sirve para el gameover )
 
+cap = cv2.VideoCapture(0)
+
 while True:
+
+    # Capturar frame
+    ret, frame = cap.read()
+
+    if not ret:
+        break
+
+    # Procesar el fotograma para reconocer la mano y obtener su posición
+    hand_pos = process_hand_frame(frame)
+
+    # Si se detectó la mano, agregar un nuevo cuadrado
+    if hand_pos is not None:
+        squares.append((hand_pos[0], hand_pos[1], 0.1, 0.01, 0.01))
+        remaining_squares += 1
+        
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -101,7 +154,7 @@ while True:
                    norm_y >= square[1] - square[2] and norm_y <= square[1] + square[2]:
                     squares.remove(square)
                     remaining_squares -= 1 #Disminuir el numero de cuadrados
-                    print(remaining_squares)
+                    print("remaining_squares", remaining_squares)
                     play_shoot_sound()
 
     # Clean la pantalla
