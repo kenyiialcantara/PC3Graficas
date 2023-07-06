@@ -11,7 +11,7 @@ pygame.init()
 
 # Definir el tamaño de la ventana
 width = 800
-height = 600
+height = 800
 size = (width, height)
 
 # Crear la ventana con OpenGL
@@ -48,7 +48,7 @@ def generate_square():
 
 
 # Generar cuadrados iniciales
-for _ in range(10):
+for _ in range(5):
     squares.append(generate_square())
 
 # Bucle principal del programa
