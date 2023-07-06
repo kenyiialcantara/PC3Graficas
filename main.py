@@ -85,8 +85,8 @@ def process_hand_frame(frame):
     # Imprime la posición de la mano
     if results.multi_hand_landmarks is not None:
         for hand_landmarks in results.multi_hand_landmarks:
-            x = hand_landmarks.landmark[mp.solutions.hands.HandLandmark.INDEX_FINGER_TIP].x
-            y = hand_landmarks.landmark[mp.solutions.hands.HandLandmark.INDEX_FINGER_TIP].y
+            x = hand_landmarks.landmark[mp.solutions.hands.HandLandmark.WRIST].x
+            y = hand_landmarks.landmark[mp.solutions.hands.HandLandmark.WRIST].y
             # Convertir la posición de la mano a coordenadas OpenGL
             norm_x = (x * width / 2) + width / 2
             norm_y = (y * height / 2) + height / 2
