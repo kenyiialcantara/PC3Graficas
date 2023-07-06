@@ -9,6 +9,7 @@ import mediapipe as mp
 
 pygame.init()
 
+active_background= False
 width = 800
 height = 800
 size = (width, height)
@@ -80,18 +81,19 @@ def process_hand_frame(frame):
     # Detección de manos en el fotograma
     results = mp_hands.process(imgRGB)
 
-    print("results.multi_hand_landmarks", results.multi_hand_landmarks)
+    #print("results.multi_hand_landmarks", results.multi_hand_landmarks)
 
     # Imprime la posición de la mano
     if results.multi_hand_landmarks is not None:
         for hand_landmarks in results.multi_hand_landmarks:
-            x = hand_landmarks.landmark[mp.solutions.hands.HandLandmark.WRIST].x
-            y = hand_landmarks.landmark[mp.solutions.hands.HandLandmark.WRIST].y
+            x = hand_landmarks.landmark[mp.solutions.hands.HandLandmark.INDEX_FINGER_TIP].x
+            y = hand_landmarks.landmark[mp.solutions.hands.HandLandmark.INDEX_FINGER_TIP].y
             # Convertir la posición de la mano a coordenadas OpenGL
-            norm_x = (x * width / 2) + width / 2
-            norm_y = (y * height / 2) + height / 2
-            norm_x = (norm_x / width) * 4 - 2
-            norm_y = -(norm_y / height) * 4 + 2
+            #norm_x = (x * width / 2) + width / 2
+            #norm_y = (y * height / 2) + height / 2
+            norm_x = (-x) * 4 + 2
+            norm_y = -(y) * 4 + 2
+            #print(norm_x, norm_y)
             return (norm_x, norm_y)
     return None
 
@@ -108,10 +110,12 @@ while True:
 
     # Capturar frame
     ret, frame = cap.read()
-
+    
     if not ret:
         break
-
+    # frameR = cv2.resize(frame, (300,300))
+    # cv2.imshow("Camara",frameR)
+    cv2.waitKey(10)
     # Procesar el fotograma para reconocer la mano y obtener su posición
     hand_pos = process_hand_frame(frame)
 
@@ -120,33 +124,33 @@ while True:
             pygame.quit()
             quit()
 
-        if event.type == pygame.MOUSEMOTION:
-            mouse_x, mouse_y = event.pos
-            norm_x = (mouse_x / width) * 4 - 2
-            norm_y = -(mouse_y / height) * 4 + 2
-            circle_pos = (norm_x, norm_y)
+        # if event.type == pygame.MOUSEMOTION:
+        #     mouse_x, mouse_y = event.pos
+        #     norm_x = (mouse_x / width) * 4 - 2
+        #     norm_y = -(mouse_y / height) * 4 + 2
+        #     circle_pos = (norm_x, norm_y)
 
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            mouse_x, mouse_y = event.pos
-            norm_x = (mouse_x / width) * 4 - 2
-            norm_y = -(mouse_y / height) * 4 + 2
+        # if event.type == pygame.MOUSEBUTTONDOWN:
+        #     mouse_x, mouse_y = event.pos
+        #     norm_x = (mouse_x / width) * 4 - 2
+        #     norm_y = -(mouse_y / height) * 4 + 2
 
-            # Si se hizo clic sobre algún cuadrado y eliminarlo
-            for square in squares:
-                if norm_x >= square[0] - square[2] and norm_x <= square[0] + square[2] and \
-                        norm_y >= square[1] - square[2] and norm_y <= square[1] + square[2]:
-                    squares.remove(square)
-                    remaining_squares -= 1
-                    play_shoot_sound()
+        #     # Si se hizo clic sobre algún cuadrado y eliminarlo
+        #     for square in squares:
+        #         if norm_x >= square[0] - square[2] and norm_x <= square[0] + square[2] and \
+        #                 norm_y >= square[1] - square[2] and norm_y <= square[1] + square[2]:
+        #             squares.remove(square)
+        #             remaining_squares -= 1
+        #             play_shoot_sound()
 
     if hand_pos is not None:
         print("aqui")
         mouse_x, mouse_y = hand_pos
-        norm_x = mouse_x
-        norm_y = -mouse_y
         #norm_x *= 0.75
         #norm_y *= 0.75
-        circle_pos = (norm_x, norm_y)
+        circle_pos = (mouse_x, mouse_y)
+        print(circle_pos)
+
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
@@ -161,7 +165,9 @@ while True:
         screen.blit(text, [center_x, center_y])
     else:
 
-        draw_background(background_texture)
+        if not active_background:
+            draw_background(background_texture)
+            active_background=True
 
         # Actualizar la posición de los cuadrados
         for i in range(len(squares)):
@@ -173,7 +179,10 @@ while True:
                 speed_x *= -1
             if y + size > 2.5 or y - size < -2.5:
                 speed_y *= -1
+            glPushMatrix()
+            glTranslatef(speed_x, speed_y, 0)
             squares[i] = (x, y, size, speed_x, speed_y)
+            glPopMatrix()
 
         # Renderizar los cuadrados en OpenGL
         glBegin(GL_QUADS)
@@ -193,11 +202,12 @@ while True:
         glBegin(GL_TRIANGLE_FAN)
         glColor3f(1.0, 1.0, 1.0)
         glVertex3f(circle_pos[0], circle_pos[1], 0.0)
-        for i in range(360):
-            degInRad = i * math.pi / 180
+        for i in range(10):
+            degInRad = (i/10)*360 * math.pi / 180
             glVertex3f(math.cos(degInRad) * 0.05 + circle_pos[0], math.sin(degInRad) * 0.05 + circle_pos[1], 0.0)
+            
         glEnd()
-
+        glFlush()
     # Actualizar la pantalla
     pygame.display.flip()
 
