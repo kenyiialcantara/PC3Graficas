@@ -148,25 +148,21 @@ while True:
 
                 space_pressed = True  # Set the flag when space key is released
 
-    print(space_pressed)
-    if space_pressed:
-        # Handle shooting action when space key is released
 
-        # Get the mouse position
-        mouse_x, mouse_y = circle_pos
-
-        # Convert mouse position to normalized coordinates
-        norm_x = (mouse_x / width) * 4 - 2
-        norm_y = -(mouse_y / height) * 4 + 2
-            # Check if the mouse position intersects with any square
-        for square in squares:
-            if mouse_x >= square[0] - square[2] and mouse_x <= square[0] + square[2] and \
-                    mouse_y >= square[1] - square[2] and mouse_y <= square[1] + square[2]:
-                squares.remove(square)
-                remaining_squares -= 1
-                play_shoot_sound()
-
-        space_pressed = False  # Reset the flag
+    # Handle shooting action when space key is released
+    # Get the mouse position
+    mouse_x, mouse_y = circle_pos
+    # Convert mouse position to normalized coordinates
+    norm_x = (mouse_x / width) * 4 - 2
+    norm_y = -(mouse_y / height) * 4 + 2
+        # Check if the mouse position intersects with any square
+    for square in squares:
+        if mouse_x >= square[0] - square[2] and mouse_x <= square[0] + square[2] and \
+                mouse_y >= square[1] - square[2] and mouse_y <= square[1] + square[2]:
+            squares.remove(square)
+            remaining_squares -= 1
+            play_shoot_sound()
+    space_pressed = False  # Reset the flag
 
 
 
