@@ -106,11 +106,13 @@ remaining_squares = len(squares)
 
 cap = cv2.VideoCapture(0)
 
+space_pressed = False  # Flag to track if space key is pressed
+
 while True:
 
     # Capturar frame
     ret, frame = cap.read()
-    
+
     if not ret:
         break
     # frameR = cv2.resize(frame, (300,300))
@@ -119,30 +121,6 @@ while True:
     # Procesar el fotograma para reconocer la mano y obtener su posición
     hand_pos = process_hand_frame(frame)
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            quit()
-
-        # if event.type == pygame.MOUSEMOTION:
-        #     mouse_x, mouse_y = event.pos
-        #     norm_x = (mouse_x / width) * 4 - 2
-        #     norm_y = -(mouse_y / height) * 4 + 2
-        #     circle_pos = (norm_x, norm_y)
-
-        # if event.type == pygame.MOUSEBUTTONDOWN:
-        #     mouse_x, mouse_y = event.pos
-        #     norm_x = (mouse_x / width) * 4 - 2
-        #     norm_y = -(mouse_y / height) * 4 + 2
-
-        #     # Si se hizo clic sobre algún cuadrado y eliminarlo
-        #     for square in squares:
-        #         if norm_x >= square[0] - square[2] and norm_x <= square[0] + square[2] and \
-        #                 norm_y >= square[1] - square[2] and norm_y <= square[1] + square[2]:
-        #             squares.remove(square)
-        #             remaining_squares -= 1
-        #             play_shoot_sound()
-
     if hand_pos is not None:
         print("aqui")
         mouse_x, mouse_y = hand_pos
@@ -150,6 +128,47 @@ while True:
         #norm_y *= 0.75
         circle_pos = (mouse_x, mouse_y)
         print(circle_pos)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            quit()
+
+        if event.type == pygame.MOUSEMOTION:
+            mouse_x, mouse_y = event.pos
+            norm_x = (mouse_x / width) * 4 - 2
+            norm_y = -(mouse_y / height) * 4 + 2
+            circle_pos = (norm_x, norm_y)
+
+        print("before pressing")
+        if event.type == pygame.KEYUP:
+
+            if event.key == pygame.K_SPACE:
+                print("after pressing")
+
+                space_pressed = True  # Set the flag when space key is released
+
+    print(space_pressed)
+    if space_pressed:
+        # Handle shooting action when space key is released
+
+        # Get the mouse position
+        mouse_x, mouse_y = circle_pos
+
+        # Convert mouse position to normalized coordinates
+        norm_x = (mouse_x / width) * 4 - 2
+        norm_y = -(mouse_y / height) * 4 + 2
+            # Check if the mouse position intersects with any square
+        for square in squares:
+            if mouse_x >= square[0] - square[2] and mouse_x <= square[0] + square[2] and \
+                    mouse_y >= square[1] - square[2] and mouse_y <= square[1] + square[2]:
+                squares.remove(square)
+                remaining_squares -= 1
+                play_shoot_sound()
+
+        space_pressed = False  # Reset the flag
+
+
 
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -205,7 +224,7 @@ while True:
         for i in range(10):
             degInRad = (i/10)*360 * math.pi / 180
             glVertex3f(math.cos(degInRad) * 0.05 + circle_pos[0], math.sin(degInRad) * 0.05 + circle_pos[1], 0.0)
-            
+
         glEnd()
         glFlush()
     # Actualizar la pantalla
