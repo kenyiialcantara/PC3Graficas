@@ -212,6 +212,7 @@ def main():
                 circle_x = (event.pos[0] - 400) / 400.0
                 circle_y = -(event.pos[1] - 400) / 400.0
 
+        print(count)
         if count == 0:
             # draw_background(ganaste_texture)
             # El aviso de "Game Over"
@@ -221,6 +222,7 @@ def main():
             center_x = (width // 2) - (text.get_width() // 2)
             center_y = (height // 2) - (text.get_height() // 2)
             screen.blit(text, [center_x, center_y])
+
 
         update()
         display()
