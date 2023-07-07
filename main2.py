@@ -11,7 +11,8 @@ import mediapipe as mp
 pygame.mixer.init()
 shoot_sound = pygame.mixer.Sound('disparo.wav')
 
-
+# Crear un objeto de detección de manos de Mediapipe
+mp_hands = mp.solutions.hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.5)
 active_background= False
 width = 800
 height = 800
@@ -102,8 +103,6 @@ def process_hand_frame(frame):
     # Convertir el fotograma a escala de grises
     imgRGB = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-    # Crear un objeto de detección de manos de Mediapipe
-    mp_hands = mp.solutions.hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.5)
 
     # Detección de manos en el fotograma
     results = mp_hands.process(imgRGB)
@@ -128,7 +127,7 @@ def main():
     init()
 
     # Crear 5 cuadrados con velocidades aleatorias
-    for _ in range(5):
+    for _ in range(15):
         x = random.uniform(-1.0, 1.0)
         y = random.uniform(-1.0, 1.0)
         size = random.uniform(0.1, 0.2)
