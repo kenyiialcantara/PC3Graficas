@@ -248,6 +248,23 @@ def GameOver():
 
     init()
     clock = pygame.time.Clock()
+
+    # sacar la hora actual y sumarle 60 segundos
+    now = datetime.now()
+
+    current_time = now.strftime("%H:%M:%S")
+    print("Current Time =", current_time)
+
+    if now.second >= 30:
+        timeAdded = now.replace(minute=now.minute + 1)
+        timeAdded = timeAdded.replace(second=now.second - 30)
+    else:
+        timeAdded = now.replace(second=now.second + 30)
+
+    # timeAdded = now.replace(minute=now.minute+1)
+    timeAddedStr = timeAdded.strftime("%H:%M:%S")
+    print("Time Added =", timeAddedStr)
+
     while True:
 
         for event in pygame.event.get():
@@ -270,6 +287,15 @@ def GameOver():
         center_x = (width // 2) - (text.get_width() // 2)
         center_y = (height // 2) - (text.get_height() // 2)
         screen.blit(text, [center_x, center_y])
+
+
+
+        nowLoop = datetime.now()
+        current_time = nowLoop.strftime("%H:%M:%S")
+        print("Current Time =", current_time)
+        if nowLoop > timeAdded:
+            print("Fin del juego")
+            break
 
         clock.tick(30)
 
