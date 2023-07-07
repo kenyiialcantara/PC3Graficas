@@ -32,6 +32,7 @@ class Square:
         self.speed_x = speed_x
         self.speed_y = speed_y
         self.visible = True
+        self.color = (random.uniform(0, 1),random.uniform(0, 1),random.uniform(0, 1))
 
 # Posición del círculo
 circle_x = 0.0
@@ -51,7 +52,7 @@ def display():
             glTranslatef(square.x, square.y, 0.0)
 
             # Dibujar el cuadrado
-            glColor3f(1.0, 0.0, 0.0)
+            glColor3f(square.color[0], square.color[1],square.color[2])
             glBegin(GL_QUADS)
             glVertex2f(-square.size, -square.size)
             glVertex2f(square.size, -square.size)
@@ -80,7 +81,11 @@ def display():
     pygame.display.flip()
 
 
+count = 5
+
 def update():
+    global count
+
     for square in squares:
         if square.visible:
             # Actualizar la posición del cuadrado
@@ -97,6 +102,8 @@ def update():
             if distance <= square.size + 0.1:  # Si hay colisión
                 square.visible = False
                 play_shoot_sound()
+                count = count - 1
+
 
 
 def process_hand_frame(frame):
