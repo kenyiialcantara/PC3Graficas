@@ -10,13 +10,16 @@ import mediapipe as mp
 resize_rate=-0.01
 pygame.mixer.init()
 shoot_sound = pygame.mixer.Sound('disparo.wav')
-
+count = 15
 # Crear un objeto de detección de manos de Mediapipe
 mp_hands = mp.solutions.hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.5)
 active_background= False
 width = 800
 height = 800
 size = (width, height)
+
+background_texture = pygame.image.load('background.jpg')
+ganaste_texture = pygame.image.load('Ganaste.png')
 
 
 def play_shoot_sound():
@@ -82,7 +85,7 @@ def display():
     pygame.display.flip()
 
 
-count = 5
+
 
 def update():
     global count
@@ -96,15 +99,15 @@ def update():
             square.y += square.speed_y
 
             #Actualizar tamaño del bloque
-            square.size+= self.resize
+            square.size+= square.resize
 
             # Cambiar la dirección si el cuadrado sale de la pantalla
             if square.x + square.size > 1.0 or square.x - square.size < -1.0:
                 square.speed_x *= -1
             if square.y + square.size > 1.0 or square.y - square.size < -1.0:
                 square.speed_y *= -1
-            if square.size > 0.3 or square.size <0.05:
-                self.resize = self.resize*-1
+            if square.size > 0.2 or square.size <0.05:
+                square.resize = square.resize*-1
                 
             # Detectar colisión con el círculo
             distance = ((square.x - circle_x) ** 2 + (square.y - circle_y) ** 2) ** 0.5
@@ -114,6 +117,30 @@ def update():
                 count = count - 1
 
 
+
+def draw_background(image):
+    glEnable(GL_TEXTURE_2D)
+    textures = glGenTextures(1)
+    glBindTexture(GL_TEXTURE_2D, textures)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+    image_data = pygame.image.tostring(image, 'RGBA', 1)
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.get_width(), image.get_height(), 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                 image_data)
+
+    # Dibujando un plano con la textura de fondo
+    glBegin(GL_QUADS)
+    glTexCoord2f(0.0, 0.0)
+    glVertex3f(-2.5, -2.5, -1.0)
+    glTexCoord2f(1.0, 0.0)
+    glVertex3f(2.5, -2.5, -1.0)
+    glTexCoord2f(1.0, 1.0)
+    glVertex3f(2.5, 2.5, -1.0)
+    glTexCoord2f(0.0, 1.0)
+    glVertex3f(-2.5, 2.5, -1.0)
+    glEnd()
+
+    glDisable(GL_TEXTURE_2D)
 
 def process_hand_frame(frame):
     # Convertir el fotograma a escala de grises
@@ -137,8 +164,9 @@ def main():
 
     global circle_x
     global circle_y
+    global count
     pygame.init()
-    pygame.display.set_mode((width, height), DOUBLEBUF | OPENGL)
+    screen = pygame.display.set_mode((width, height), DOUBLEBUF | OPENGL)
 
     init()
 
@@ -193,11 +221,61 @@ def main():
                 circle_x = (event.pos[0] - 400) / 400.0
                 circle_y = -(event.pos[1] - 400) / 400.0
 
+        print(count)
+        if count <= 0:
+            # draw_background(ganaste_texture)
+            # El aviso de "Game Over"
+            print('Gameover')
+            font = pygame.font.SysFont('serif', 40)
+            text = font.render('Game over', False, (1, 1, 1))
+            center_x = (width // 2) - (text.get_width() // 2)
+            center_y = (height // 2) - (text.get_height() // 2)
+            screen.blit(text, [center_x, center_y])
+            break
         update()
         display()
 
         clock.tick(60)
 
 
+
+
+
+def GameOver():
+
+    pygame.init()
+    screen = pygame.display.set_mode((width, height), DOUBLEBUF | OPENGL)
+
+    init()
+    clock = pygame.time.Clock()
+    while True:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.MOUSEMOTION:
+                # Actualizar la posición del círculo según la posición del ratón
+                circle_x = (event.pos[0] - 400) / 400.0
+                circle_y = -(event.pos[1] - 400) / 400.0
+
+
+
+
+        print('Gameover')
+        draw_background(ganaste_texture)
+        print('Gameover')
+        font = pygame.font.SysFont('serif', 40)
+        text = font.render('Game over', False, (1, 1, 1))
+        center_x = (width // 2) - (text.get_width() // 2)
+        center_y = (height // 2) - (text.get_height() // 2)
+        screen.blit(text, [center_x, center_y])
+
+        clock.tick(30)
+
+
 if __name__ == "__main__":
     main()
+    pygame.quit()
+    GameOver()
+

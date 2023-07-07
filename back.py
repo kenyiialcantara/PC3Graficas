@@ -108,7 +108,7 @@ def display():
     pygame.display.flip()
 
 
-count = 5
+count = 15
 
 def update():
     global count
@@ -213,7 +213,7 @@ def main():
                 circle_y = -(event.pos[1] - 400) / 400.0
 
         print(count)
-        if count == 0:
+        if count <= 0:
             # draw_background(ganaste_texture)
             # El aviso de "Game Over"
             print('Gameover')
