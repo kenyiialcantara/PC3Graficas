@@ -8,6 +8,11 @@ from math import sin, cos, pi
 
 # Lista de cuadrados
 squares = []
+
+# Posición del círculo
+circle_x = 0.0
+circle_y = 0.0
+
 class Square:
     def __init__(self, x, y, size, speed_x, speed_y):
         self.x = x
@@ -15,10 +20,7 @@ class Square:
         self.size = size
         self.speed_x = speed_x
         self.speed_y = speed_y
-
-# Posición del círculo
-circle_x = 0.0
-circle_y = 0.0
+        self.visible = True
 
 
 def init():
@@ -26,22 +28,25 @@ def init():
 
 
 def display():
+    global circle_x, circle_y
+
     glClear(GL_COLOR_BUFFER_BIT)
 
     for square in squares:
-        glPushMatrix()
-        glTranslatef(square.x, square.y, 0.0)
+        if square.visible:
+            glPushMatrix()
+            glTranslatef(square.x, square.y, 0.0)
 
-        # Dibujar el cuadrado
-        glColor3f(1.0, 0.0, 0.0)
-        glBegin(GL_QUADS)
-        glVertex2f(-square.size, -square.size)
-        glVertex2f(square.size, -square.size)
-        glVertex2f(square.size, square.size)
-        glVertex2f(-square.size, square.size)
-        glEnd()
+            # Dibujar el cuadrado
+            glColor3f(1.0, 0.0, 0.0)
+            glBegin(GL_QUADS)
+            glVertex2f(-square.size, -square.size)
+            glVertex2f(square.size, -square.size)
+            glVertex2f(square.size, square.size)
+            glVertex2f(-square.size, square.size)
+            glEnd()
 
-        glPopMatrix()
+            glPopMatrix()
 
     glPushMatrix()
     glTranslatef(circle_x, circle_y, 0.0)
@@ -63,22 +68,29 @@ def display():
 
 
 def update():
-    for square in squares:
-        # Actualizar la posición del cuadrado
-        square.x += square.speed_x
-        square.y += square.speed_y
+    global squares
 
-        # Cambiar la dirección si el cuadrado sale de la pantalla
-        if square.x + square.size > 1.0 or square.x - square.size < -1.0:
-            square.speed_x *= -1
-        if square.y + square.size > 1.0 or square.y - square.size < -1.0:
-            square.speed_y *= -1
+    for square in squares:
+        if square.visible:
+            # Actualizar la posición del cuadrado
+            square.x += square.speed_x
+            square.y += square.speed_y
+
+            # Cambiar la dirección si el cuadrado sale de la pantalla
+            if square.x + square.size > 1.0 or square.x - square.size < -1.0:
+                square.speed_x *= -1
+            if square.y + square.size > 1.0 or square.y - square.size < -1.0:
+                square.speed_y *= -1
+
+            # Detectar colisión con el círculo
+            distance = ((square.x - circle_x) ** 2 + (square.y - circle_y) ** 2) ** 0.5
+            if distance <= square.size + 0.2:  # Si hay colisión
+                square.visible = False
 
 
 def main():
+    global circle_x, circle_y
 
-    global circle_x
-    global circle_y
     pygame.init()
     pygame.display.set_mode((400, 400), DOUBLEBUF | OPENGL)
 

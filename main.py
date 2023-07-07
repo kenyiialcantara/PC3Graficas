@@ -105,16 +105,6 @@ count = 0
 
 #Dibujando elemntos
 
-
-
-
-
-
-
-
-
-
-
 while True:
 
     for event in pygame.event.get():
@@ -154,7 +144,6 @@ while True:
                 remaining_squares -= 1
                 play_shoot_sound()
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
