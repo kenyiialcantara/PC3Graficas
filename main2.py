@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pygame
 import sys
 from math import sin, cos, pi
@@ -191,9 +193,9 @@ def main():
 
         if not ret:
             break
-        # frameR = cv2.resize(frame, (800, 800))
-        # cv2.imshow("Camara", frameR)
-        # cv2.waitKey(10)
+        frameR = cv2.resize(frame, (800, 800))
+        cv2.imshow("Camara", frameR)
+        cv2.waitKey(10)
 
         if hand_pos is not None:
             print("aqui")
