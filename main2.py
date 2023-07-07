@@ -7,7 +7,7 @@ import random
 import cv2
 import mediapipe as mp
 
-
+resize_rate=-0.01
 pygame.mixer.init()
 shoot_sound = pygame.mixer.Sound('disparo.wav')
 
@@ -85,18 +85,26 @@ count = 5
 
 def update():
     global count
-
+    global resize_rate
+    
     for square in squares:
         if square.visible:
+            rate = resize_rate
             # Actualizar la posición del cuadrado
             square.x += square.speed_x
             square.y += square.speed_y
+
+            #Actualizar tamaño del bloque
+            square.size+= rate
 
             # Cambiar la dirección si el cuadrado sale de la pantalla
             if square.x + square.size > 1.0 or square.x - square.size < -1.0:
                 square.speed_x *= -1
             if square.y + square.size > 1.0 or square.y - square.size < -1.0:
                 square.speed_y *= -1
+            if square.size > 0.3:
+                rate = rate*-1
+                
             # Detectar colisión con el círculo
             distance = ((square.x - circle_x) ** 2 + (square.y - circle_y) ** 2) ** 0.5
             if distance <= square.size + 0.1:  # Si hay colisión
