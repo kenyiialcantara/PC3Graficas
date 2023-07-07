@@ -32,6 +32,7 @@ class Square:
         self.speed_x = speed_x
         self.speed_y = speed_y
         self.visible = True
+        self.resize = 0.01
         self.color = (random.uniform(0, 1),random.uniform(0, 1),random.uniform(0, 1))
 
 # Posición del círculo
@@ -85,25 +86,25 @@ count = 5
 
 def update():
     global count
-    global resize_rate
+
     
     for square in squares:
         if square.visible:
-            rate = resize_rate
+            
             # Actualizar la posición del cuadrado
             square.x += square.speed_x
             square.y += square.speed_y
 
             #Actualizar tamaño del bloque
-            square.size+= rate
+            square.size+= self.resize
 
             # Cambiar la dirección si el cuadrado sale de la pantalla
             if square.x + square.size > 1.0 or square.x - square.size < -1.0:
                 square.speed_x *= -1
             if square.y + square.size > 1.0 or square.y - square.size < -1.0:
                 square.speed_y *= -1
-            if square.size > 0.3:
-                rate = rate*-1
+            if square.size > 0.3 or square.size <0.05:
+                self.resize = self.resize*-1
                 
             # Detectar colisión con el círculo
             distance = ((square.x - circle_x) ** 2 + (square.y - circle_y) ** 2) ** 0.5
