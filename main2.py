@@ -7,10 +7,7 @@ import random
 import cv2
 import mediapipe as mp
 
-
-background_texture = pygame.image.load('background.jpg')
-ganaste_texture = pygame.image.load('Ganaste.png')
-
+resize_rate=-0.01
 pygame.mixer.init()
 shoot_sound = pygame.mixer.Sound('disparo.wav')
 
@@ -40,30 +37,6 @@ class Square:
 # Posición del círculo
 circle_x = 0.0
 circle_y = 0.0
-
-def draw_background(image):
-    glEnable(GL_TEXTURE_2D)
-    textures = glGenTextures(1)
-    glBindTexture(GL_TEXTURE_2D, textures)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-    image_data = pygame.image.tostring(image, 'RGBA', 1)
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.get_width(), image.get_height(), 0, GL_RGBA, GL_UNSIGNED_BYTE,
-                 image_data)
-
-    # Dibujando un plano con la textura de fondo
-    glBegin(GL_QUADS)
-    glTexCoord2f(0.0, 0.0)
-    glVertex3f(-2.5, -2.5, -1.0)
-    glTexCoord2f(1.0, 0.0)
-    glVertex3f(2.5, -2.5, -1.0)
-    glTexCoord2f(1.0, 1.0)
-    glVertex3f(2.5, 2.5, -1.0)
-    glTexCoord2f(0.0, 1.0)
-    glVertex3f(-2.5, 2.5, -1.0)
-    glEnd()
-
-    glDisable(GL_TEXTURE_2D)
 
 
 def init():
@@ -112,18 +85,26 @@ count = 5
 
 def update():
     global count
-
+    global resize_rate
+    
     for square in squares:
         if square.visible:
+            rate = resize_rate
             # Actualizar la posición del cuadrado
             square.x += square.speed_x
             square.y += square.speed_y
+
+            #Actualizar tamaño del bloque
+            square.size+= rate
 
             # Cambiar la dirección si el cuadrado sale de la pantalla
             if square.x + square.size > 1.0 or square.x - square.size < -1.0:
                 square.speed_x *= -1
             if square.y + square.size > 1.0 or square.y - square.size < -1.0:
                 square.speed_y *= -1
+            if square.size > 0.3:
+                rate = rate*-1
+                
             # Detectar colisión con el círculo
             distance = ((square.x - circle_x) ** 2 + (square.y - circle_y) ** 2) ** 0.5
             if distance <= square.size + 0.1:  # Si hay colisión
@@ -155,9 +136,8 @@ def main():
 
     global circle_x
     global circle_y
-    global count
     pygame.init()
-    screen = pygame.display.set_mode((width, height), DOUBLEBUF | OPENGL)
+    pygame.display.set_mode((width, height), DOUBLEBUF | OPENGL)
 
     init()
 
@@ -211,16 +191,6 @@ def main():
                 # Actualizar la posición del círculo según la posición del ratón
                 circle_x = (event.pos[0] - 400) / 400.0
                 circle_y = -(event.pos[1] - 400) / 400.0
-
-        if count == 0:
-            # draw_background(ganaste_texture)
-            # El aviso de "Game Over"
-            print('Gameover')
-            font = pygame.font.SysFont('serif', 40)
-            text = font.render('Game over', False, (1, 1, 1))
-            center_x = (width // 2) - (text.get_width() // 2)
-            center_y = (height // 2) - (text.get_height() // 2)
-            screen.blit(text, [center_x, center_y])
 
         update()
         display()
