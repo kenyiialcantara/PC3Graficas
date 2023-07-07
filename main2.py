@@ -81,20 +81,21 @@ def display():
 
 def update():
     for square in squares:
-        # Actualizar la posición del cuadrado
-        square.x += square.speed_x
-        square.y += square.speed_y
+        if square.visible:
+            # Actualizar la posición del cuadrado
+            square.x += square.speed_x
+            square.y += square.speed_y
 
-        # Cambiar la dirección si el cuadrado sale de la pantalla
-        if square.x + square.size > 1.0 or square.x - square.size < -1.0:
-            square.speed_x *= -1
-        if square.y + square.size > 1.0 or square.y - square.size < -1.0:
-            square.speed_y *= -1
-        # Detectar colisión con el círculo
-        distance = ((square.x - circle_x) ** 2 + (square.y - circle_y) ** 2) ** 0.5
-        if distance <= square.size + 0.1:  # Si hay colisión
-            square.visible = False
-            play_shoot_sound()
+            # Cambiar la dirección si el cuadrado sale de la pantalla
+            if square.x + square.size > 1.0 or square.x - square.size < -1.0:
+                square.speed_x *= -1
+            if square.y + square.size > 1.0 or square.y - square.size < -1.0:
+                square.speed_y *= -1
+            # Detectar colisión con el círculo
+            distance = ((square.x - circle_x) ** 2 + (square.y - circle_y) ** 2) ** 0.5
+            if distance <= square.size + 0.1:  # Si hay colisión
+                square.visible = False
+                play_shoot_sound()
 
 
 def process_hand_frame(frame):
@@ -147,9 +148,9 @@ def main():
 
         if not ret:
             break
-        frameR = cv2.resize(frame, (800, 800))
-        cv2.imshow("Camara", frameR)
-        cv2.waitKey(10)
+        # frameR = cv2.resize(frame, (800, 800))
+        # cv2.imshow("Camara", frameR)
+        # cv2.waitKey(10)
 
         if hand_pos is not None:
             print("aqui")
