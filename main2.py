@@ -8,28 +8,35 @@ from OpenGL.GL import *
 import random
 import cv2
 import mediapipe as mp
-
+# Definimos la taza de velocidad de cambio de tamanio de los cuadrados
 resize_rate=-0.01
+# Inicializamos el modulo de la clase que nos permitira importar los sonidos
 pygame.mixer.init()
+# Cargamos el clip del audio del sonido de disparo
 shoot_sound = pygame.mixer.Sound('disparo.wav')
+# Definimos la cantidad de cuadrados que crearemos inicialmente con un contador
 count = 15
-# Crear un objeto de detección de manos de Mediapipe
+# Instanciamos el objeto de mediapipe para deteccion de manos considerando un confidence bastante holgado
+# para asi tener una deteccion más fluida
 mp_hands = mp.solutions.hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.5)
 active_background= False
+# Definimos las dimensiones a usar
 width = 800
 height = 800
 size = (width, height)
 
+# Cargamos las imagenes usando pygame
 background_texture = pygame.image.load('background.jpg')
 ganaste_texture = pygame.image.load('Ganaste.png')
 
-
+# Funcion que permitira reproduccir el sonido del disparo
 def play_shoot_sound():
     shoot_sound.play()
 
-# Lista de cuadrados
+# Lista de cuadrados creados durante el juego
 squares = []
 class Square:
+    # Se inicializa con sus coordenadas, su tamanio, y su velocidad de desplazamiento en cada eje
     def __init__(self, x, y, size, speed_x, speed_y):
         self.x = x
         self.y = y
@@ -40,7 +47,7 @@ class Square:
         self.resize = 0.01
         self.color = (random.uniform(0, 1),random.uniform(0, 1),random.uniform(0, 1))
 
-# Posición del círculo
+# Posición del círculo que simbolizara la mira de disparo
 circle_x = 0.0
 circle_y = 0.0
 
@@ -48,18 +55,19 @@ circle_y = 0.0
 def init():
     glClearColor(0.0, 0.0, 0.0, 1.0)
 
-
+# Funcionque repintara la pantalla en cada interacion del bucle principal
 def display():
     glClear(GL_COLOR_BUFFER_BIT)
-
+    # Recorremos nuestra lista de cuadrados activos para mostrarlos y trackearlos
     for square in squares:
         if square.visible:
             glPushMatrix()
             glTranslatef(square.x, square.y, 0.0)
 
-            # Dibujar el cuadrado
+            # Dibujar el cuadrado indicando sus colores aleatorios inicializados
             glColor3f(square.color[0], square.color[1],square.color[2])
             glBegin(GL_QUADS)
+            # Seteo de las coordenadas de los vertices del cuadrado a dibujar
             glVertex2f(-square.size, -square.size)
             glVertex2f(square.size, -square.size)
             glVertex2f(square.size, square.size)
@@ -71,7 +79,7 @@ def display():
     glPushMatrix()
     glTranslatef(circle_x, circle_y, 0.0)
 
-    # Dibujar el círculo
+    # Dibujar el círculo como un poligono de tantos lados que simule un circulo
     glColor3f(0.0, 1.0, 0.0)
     glBegin(GL_TRIANGLE_FAN)
     glVertex2f(0.0, 0.0)
@@ -88,11 +96,11 @@ def display():
 
 
 
-
+# Funcion encargada de controlar los cambios en cada interacion
 def update():
     global count
 
-    
+    # Verificamos todos los cuadrados activos y los dezplazamos acorde a su velocidad respectiva
     for square in squares:
         if square.visible:
             
@@ -100,10 +108,10 @@ def update():
             square.x += square.speed_x
             square.y += square.speed_y
 
-            #Actualizar tamaño del bloque
+            # Actualizar tamaño del bloque
             square.size+= square.resize
 
-            # Cambiar la dirección si el cuadrado sale de la pantalla
+            # Cambiar la dirección si el cuadrado sale de la pantalla simulando rebote
             if square.x + square.size > 1.0 or square.x - square.size < -1.0:
                 square.speed_x *= -1
             if square.y + square.size > 1.0 or square.y - square.size < -1.0:
@@ -111,12 +119,12 @@ def update():
             if square.size > 0.2 or square.size <0.05:
                 square.resize = square.resize*-1
                 
-            # Detectar colisión con el círculo
+            # Detectar colisión con el círculo que simboliza la mira
             distance = ((square.x - circle_x) ** 2 + (square.y - circle_y) ** 2) ** 0.5
-            if distance <= square.size + 0.1:  # Si hay colisión
-                square.visible = False
+            if distance <= square.size + 0.1:  # Validar un marguen de cercania considerada colision
+                square.visible = False # Ocultar el cuadrado colisionado
                 play_shoot_sound()
-                count = count - 1
+                count = count - 1 # Actualizar la cantidad de cuadrados activos 
 
 
 
@@ -149,14 +157,15 @@ def process_hand_frame(frame):
     imgRGB = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
 
-    # Detección de manos en el fotograma
+    # Detección de manos con mediapipe en el fotograma pasado de parametro
     results = mp_hands.process(imgRGB)
-    # Imprime la posición de la mano
+    # Validar si hubo alguna deteccion de una mano
     if results.multi_hand_landmarks is not None:
         for hand_landmarks in results.multi_hand_landmarks:
+            # Extraer las coordenadas de la deteccion 
             x = hand_landmarks.landmark[mp.solutions.hands.HandLandmark.INDEX_FINGER_TIP].x
             y = hand_landmarks.landmark[mp.solutions.hands.HandLandmark.INDEX_FINGER_TIP].y
-            # Convertir la posición de la mano a coordenadas OpenGL
+
 
             return (800-x*800, y*800)
     return None
@@ -172,7 +181,7 @@ def main():
 
     init()
 
-    # Crear 5 cuadrados con velocidades aleatorias
+    # Crear cuadrados con parametros aleatorios
     for _ in range(15):
         x = random.uniform(-1.0, 1.0)
         y = random.uniform(-1.0, 1.0)
@@ -181,18 +190,20 @@ def main():
         speed_y = random.uniform(-0.01, 0.01)
         square = Square(x, y, size, speed_x, speed_y)
         squares.append(square)
-
+    # Controlar la velocidad del bucle
     clock = pygame.time.Clock()
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(0) # Activar webCam
 
     while True:
 
-        # # Capturar frame
+        # Capturar frame
         ret, frame = cap.read()
+        # Hacer inferencia con el modelo de mediapipe
         hand_pos = process_hand_frame(frame)
 
         if not ret:
             break
+        # Redimensionamiento
         frameR = cv2.resize(frame, (800, 800))
         cv2.imshow("Camara", frameR)
         cv2.waitKey(10)
@@ -204,13 +215,11 @@ def main():
             # norm_y *= 0.75
             circle_pos = (mouse_x, mouse_y)
             print(circle_pos)
-
-            # Handle shooting action when space key is released
-            # Get the mouse position
+            # Extraer coordenadas del mouse
             mouse_x, mouse_y = circle_pos
-            # Convert mouse position to normalized coordinates
             # circle_x = (mouse_x / width) * 4 - 2
             # circle_y = -(mouse_y / height) * 4 + 2
+            # Ajustar normalizando posiciones para el circulo
             circle_x = (mouse_x - 400) / 400.0
             circle_y = -(mouse_y - 400) / 400.0
 
@@ -236,7 +245,7 @@ def main():
             break
         update()
         display()
-
+        # Control de iteraciones para evitar crasheo
         clock.tick(60)
 
 
